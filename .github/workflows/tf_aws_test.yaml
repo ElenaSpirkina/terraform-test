@@ -1,0 +1,57 @@
+name: TF AWS Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      tf_cmd:
+        type: choice
+        description: terraform command
+        default: plan
+        options:
+          - plan
+          - apply
+
+env:
+  AWS_ACCESS_KEY_ID:      ${{ secrets.ACCESS_KEY_STAGING }}
+  AWS_SECRET_ACCESS_KEY:  ${{ secrets.SECRET_KEY_STAGING }}
+  AWS_REGION:             us-east-2
+  tf_working_dir:         terraform
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    name: ${{ github.actor }} - perform tf ${{ github.event.inputs.tf_cmd }}
+    steps:
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        working-directory: ${{ env.tf_working_dir }}
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ${{ env.tf_working_dir }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: ${{ env.tf_working_dir }}
+
+      - name: Terraform Plan
+        id: plan
+        if: ${{ github.event.inputs.tf_cmd }} == 'plan'
+        run: terraform plan -no-color
+        working-directory: ${{ env.tf_working_dir }}
+      
+      - name: Terraform Apply
+        id: apply
+        if: ${{ github.event.inputs.tf_cmd }} == 'apply'
+        run: terraform apply -auto-approve -input=false
+        working-directory: ${{ env.tf_working_dir }}
+        
