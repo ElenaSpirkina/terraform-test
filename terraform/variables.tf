@@ -1,13 +1,6 @@
 variable "region" {
-  description = "AWS region for hosting our your network"
+  description = "AWS region for hosting our network"
   default = "us-east-2"
-}
-
-variable "amis" {
-  description = "Base AMI to launch the instances"
-  default = {
-    us-east-2 = "ami-0beaa649c482330f7"
-  }
 }
 
 variable "vm_num" {
@@ -20,9 +13,20 @@ variable "vm_type" {
   default = "t2.micro"
 }
 
+
+##################################################
 variable "key_name" {
   description = "Key name for SSH into EC2"
-  default = "my-test-kp"
+  default = {
+    us-east-2 = "my-test-kp"
+  }
+}
+
+variable "amis" {
+  description = "Base AMI to launch the instances"
+  default = {
+    us-east-2 = "ami-0a606d8395a538502"
+  }
 }
 
 variable "vm_subnet" {
@@ -34,5 +38,7 @@ variable "vm_subnet" {
 
 variable "secgr" {
   description = "Security group for EC2 instance"
-  default = "sg-06c07ed8e81731123"
+  default = {
+    us-east-2 = "sg-06c07ed8e81731123"
+  }
 }
